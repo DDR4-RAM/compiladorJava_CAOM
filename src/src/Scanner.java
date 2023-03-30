@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+// AUTOR: Carlos Andres Ortiz Montero
 public class Scanner {
 
     private final String source;
@@ -16,7 +16,8 @@ public class Scanner {
     private static final Map<String, TipoToken> palabrasReservadas;
 
 
-    // PUREBA clase hola.fun myfun [ dsandjlksandnlknakl ]imp dna. var variable = value. nulo fal ver  ciclo condicion [ sentencias ] si( cond1 y cond2 o cond3 y cond4) este este  super super
+    // PUREBA
+    // clase hola.fun myfun [ dsandjlksandnlknakl ]imp dna. var variable = value. nulo fal ver  ciclo condicion [ sentencias ] si( cond1 y cond2 o cond3 y cond4) este este  super super
     static {
         palabrasReservadas = new HashMap<>();
         // Clase
