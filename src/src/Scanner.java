@@ -24,24 +24,26 @@ public class Scanner {
     static {
         palabrasReservadas = new HashMap<>();
         // Clase
-        palabrasReservadas.put("clase", TipoToken.CLASE);
+        palabrasReservadas.put("class", TipoToken.CLASE);
         palabrasReservadas.put("este", TipoToken.ESTE);
         palabrasReservadas.put("super", TipoToken.SUPER);
         // Condiciones
-        palabrasReservadas.put("si", TipoToken.SI);
+        palabrasReservadas.put("if", TipoToken.IF);
         palabrasReservadas.put("y", TipoToken.Y);
         palabrasReservadas.put("o", TipoToken.O);
         // Variables
         palabrasReservadas.put("var", TipoToken.VAR);
         palabrasReservadas.put("fal", TipoToken.FAL);
+        palabrasReservadas.put("for", TipoToken.FOR);
         palabrasReservadas.put("ver", TipoToken.VER);
         palabrasReservadas.put("nulo", TipoToken.NULO);
         //Funciones
         palabrasReservadas.put("fun", TipoToken.FUN);
-        palabrasReservadas.put("imp", TipoToken.IMP);
-        palabrasReservadas.put("ret", TipoToken.RET);
+        palabrasReservadas.put("print", TipoToken.PRINT);
+        //palabrasReservadas.put("imp", TipoToken.IMP);
+        palabrasReservadas.put("return", TipoToken.RETURN);
         // Ciclos
-        palabrasReservadas.put("ciclo", TipoToken.CICLO); // ES EL MIENTRAS
+        palabrasReservadas.put("while", TipoToken.WHILE); // ES EL MIENTRAS
         palabrasReservadas.put("ademas", TipoToken.ADEMAS);
         palabrasReservadas.put("para", TipoToken.PARA);
     }
@@ -133,7 +135,6 @@ public class Scanner {
                         } else if (caracter == '.') {
                             tokens.add(new Token(TipoToken.PUNTO, ".", null, index + 1));
                         } else if (caracter == ';') {
-                            System.out.println("PUNTO Y COMA");
                             tokens.add(new Token(TipoToken.PUNTO_COMA, ";", null, index + 1));
                         } else if (Character.isAlphabetic(caracter)) {
                             estado = 1;
@@ -210,6 +211,7 @@ public class Scanner {
                         }
                         break;
                 }
+                System.out.println(estado);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
                 e.printStackTrace();

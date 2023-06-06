@@ -16,18 +16,19 @@ public class AnalizadorSintactico {
 
     private Token preanalisis;
 
+    private String errorMessage = "";
+
     public String parse() {
         System.out.println("[I] Inicia Parser...");
         i = 0;
         preanalisis = tokens.get(i);
         PROGRAM();
         if (!error && !preanalisis.tipo.equals(TipoToken.EOF)) {
-            System.out.println("[X] Posición " + preanalisis.posicion + ". No se esperaba el token " + preanalisis.tipo + " Metodo: parse()");
             return "[X] Posicion " + preanalisis.posicion + ". No se esperaba el token " + preanalisis.tipo + " Metodo: parse()";
         } else if (!error && preanalisis.tipo.equals(TipoToken.EOF)) {
             return "Sin errores";
         }
-        return "[X] Error";
+        return errorMessage;
     }
 
     private void same(TipoToken tipo) {
@@ -40,17 +41,17 @@ public class AnalizadorSintactico {
             i++;
             preanalisis = tokens.get(i);
         }*/
-
+        System.out.println("\nSAME** ");
         System.out.print(preanalisis.tipo.toString());
-        System.out.print(" = "+i+" = ");
-        System.out.println(tipo);
+        System.out.print(" = " + i + " = ");
+        System.out.print(tipo);
 
         if (preanalisis.tipo == tipo) {
             i++;
             preanalisis = tokens.get(i);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ". Se esperaba un  " + tipo + ". Metodo: same()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ". Se esperaba un  " + tipo + ". Metodo: same()";
 
         }
     }
@@ -64,7 +65,7 @@ public class AnalizadorSintactico {
             DECLARATION();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ". Token " + preanalisis.tipo + ". Metodo: PROGRAM()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ". Token " + preanalisis.tipo + ". Metodo: PROGRAM()";
         }
     }
 
@@ -89,7 +90,6 @@ public class AnalizadorSintactico {
             STATEMENT();
             DECLARATION();
         } else if (preanalisis.tipo.equals(TipoToken.COMENTARIO)) {
-            System.out.println("COMENTARIO");
             i++;
             preanalisis = tokens.get(i);
             DECLARATION();
@@ -107,7 +107,7 @@ public class AnalizadorSintactico {
             same(TipoToken.LLAV_CIERRE);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ". Se esperaba un  " + TipoToken.CLASE + ". Metodo: CLASS_DECL()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ". Se esperaba un  " + TipoToken.CLASE + ". Metodo: CLASS_DECL()";
         }
     }
 
@@ -122,13 +122,12 @@ public class AnalizadorSintactico {
 
     void FUN_DECL() {
         if (error) return;
-
         if (preanalisis.tipo.equals(TipoToken.FUN)) {
             same(TipoToken.FUN);
             FUNCTION();
         } else {
             error = true;
-            System.out.println("[X] Posición:" + preanalisis.posicion + ".\nEsperado: " + TipoToken.FUN + ".\nMetodo: FUN_DECL()");
+            errorMessage = "[X] Posición:" + preanalisis.posicion + ".\nEsperado: " + TipoToken.FUN + ".\nMetodo: FUN_DECL()";
         }
     }
 
@@ -142,7 +141,7 @@ public class AnalizadorSintactico {
             same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.ID + ".\nMetodo: VAR_DECL()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.ID + ".\nMetodo: VAR_DECL()";
         }
     }
 
@@ -159,7 +158,6 @@ public class AnalizadorSintactico {
 
     void STATEMENT() {
         if (error) return;
-
         if (preanalisis.tipo.equals(TipoToken.NOT) || preanalisis.tipo.equals(TipoToken.MENOS) || preanalisis.tipo.equals(TipoToken.TRUE) || preanalisis.tipo.equals(TipoToken.FALSE) ||
                 preanalisis.tipo.equals(TipoToken.NULL) || preanalisis.tipo.equals(TipoToken.THIS) || preanalisis.tipo.equals(TipoToken.NUMERO) || preanalisis.tipo.equals(TipoToken.CADENA) ||
                 preanalisis.tipo.equals(TipoToken.ID) || preanalisis.tipo.equals(TipoToken.PAR_ABRE) || preanalisis.tipo.equals(TipoToken.SUPER)) {
@@ -178,7 +176,7 @@ public class AnalizadorSintactico {
             BLOCK();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: EXPRESSION.\nMetodo: STATEMENT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: EXPRESSION.\nMetodo: STATEMENT()";
         }
     }
 
@@ -192,7 +190,7 @@ public class AnalizadorSintactico {
             same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: EXPRESSION.\nMetodo: EXPR_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: EXPRESSION.\nMetodo: EXPR_STMT()";
         }
     }
 
@@ -209,7 +207,7 @@ public class AnalizadorSintactico {
             STATEMENT();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.FOR + ".\nMetodo: FOR_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.FOR + ".\nMetodo: FOR_STMT()";
         }
     }
 
@@ -223,9 +221,11 @@ public class AnalizadorSintactico {
                 preanalisis.tipo.equals(TipoToken.NULL) || preanalisis.tipo.equals(TipoToken.THIS) || preanalisis.tipo.equals(TipoToken.NUMERO) || preanalisis.tipo.equals(TipoToken.CADENA) ||
                 preanalisis.tipo.equals(TipoToken.ID) || preanalisis.tipo.equals(TipoToken.PAR_ABRE) || preanalisis.tipo.equals(TipoToken.SUPER)) {
             EXPR_STMT();
+        } else if (preanalisis.tipo.equals(TipoToken.PUNTO_COMA)) {
+            same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.PAR_ABRE + ".\nMetodo: FOR_STMT_1()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.PAR_ABRE + ".\nMetodo: FOR_STMT_1()";
         }
     }
 
@@ -241,13 +241,12 @@ public class AnalizadorSintactico {
             same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperado: " + TipoToken.NOT + ".\nMetodo: FOR_STMT_2()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: FOR_STMT_2()";
         }
     }
 
     void FOR_STMT_3() {
         if (error) return;
-
         if (preanalisis.tipo.equals(TipoToken.NOT) || preanalisis.tipo.equals(TipoToken.MENOS) || preanalisis.tipo.equals(TipoToken.TRUE) || preanalisis.tipo.equals(TipoToken.FALSE) ||
                 preanalisis.tipo.equals(TipoToken.NULL) || preanalisis.tipo.equals(TipoToken.THIS) || preanalisis.tipo.equals(TipoToken.NUMERO) || preanalisis.tipo.equals(TipoToken.CADENA) ||
                 preanalisis.tipo.equals(TipoToken.ID) || preanalisis.tipo.equals(TipoToken.PAR_ABRE) || preanalisis.tipo.equals(TipoToken.SUPER)) {
@@ -267,7 +266,7 @@ public class AnalizadorSintactico {
             ELSE_STATEMENT();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.IF + ".\nMetodo: IF_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.IF + ".\nMetodo: IF_STMT()";
         }
     }
 
@@ -289,7 +288,7 @@ public class AnalizadorSintactico {
             same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.PRINT + ".\nMetodo: PRINT_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.PRINT + ".\nMetodo: PRINT_STMT()";
         }
     }
 
@@ -302,7 +301,7 @@ public class AnalizadorSintactico {
             same(TipoToken.PUNTO_COMA);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.RETURN + ".\nMetodo: RETURN_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.RETURN + ".\nMetodo: RETURN_STMT()";
         }
     }
 
@@ -327,7 +326,7 @@ public class AnalizadorSintactico {
             STATEMENT();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.WHILE + ".\nMetodo: WHILE_STMT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: " + TipoToken.WHILE + ".\nMetodo: WHILE_STMT()";
         }
     }
 
@@ -340,7 +339,7 @@ public class AnalizadorSintactico {
             same(TipoToken.LLAV_CIERRE);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando" + TipoToken.LLAV_ABRE + ".\nMetodo: BLOCK()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando" + TipoToken.LLAV_ABRE + ".\nMetodo: BLOCK()";
         }
     }
 
@@ -368,7 +367,7 @@ public class AnalizadorSintactico {
             ASSIGNMENT();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: EXPRESSION()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: EXPRESSION()";
         }
     }
 
@@ -382,7 +381,7 @@ public class AnalizadorSintactico {
             ASSIGNMENT_OPC();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: ASSIGNMENT()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: ASSIGNMENT()";
         }
     }
 
@@ -405,7 +404,7 @@ public class AnalizadorSintactico {
             ASSIGNMENT_OPC();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: LOGIC_OR()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: LOGIC_OR()";
         }
     }
 
@@ -429,7 +428,7 @@ public class AnalizadorSintactico {
             LOGIC_AND_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: LOGIC_AND()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: LOGIC_AND()";
         }
     }
 
@@ -476,7 +475,7 @@ public class AnalizadorSintactico {
             COMPARISON_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: COMPARISON()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: COMPARISON()";
         }
     }
 
@@ -512,18 +511,19 @@ public class AnalizadorSintactico {
             TERM_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: TERM()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: TERM()";
         }
     }
 
     void TERM_2() {
         if (error) return;
-
         if (preanalisis.tipo.equals(TipoToken.MENOS)) {
             same(TipoToken.MENOS);
+            FACTOR();
             TERM_2();
         } else if (preanalisis.tipo.equals(TipoToken.MAS)) {
             same(TipoToken.MAS);
+            FACTOR();
             TERM_2();
         }
     }
@@ -538,7 +538,7 @@ public class AnalizadorSintactico {
             FACTOR_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: FACTOR()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: FACTOR()";
         }
     }
 
@@ -571,7 +571,7 @@ public class AnalizadorSintactico {
             CALL();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: UNARY()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: UNARY()";
         }
     }
 
@@ -586,7 +586,7 @@ public class AnalizadorSintactico {
             CALL_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: CALL()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: CALL()";
         }
     }
 
@@ -639,14 +639,15 @@ public class AnalizadorSintactico {
             same(TipoToken.ID);
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: PRIMARY()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: PRIMARY()";
         }
     }
 
     void FUNCTION() {
         if (error) return;
-        if (preanalisis.tipo.equals(TipoToken.FUN)) {
-            same(TipoToken.FUN);
+        //System.out.println("XX"+preanalisis.tipo);
+        if (preanalisis.tipo.equals(TipoToken.ID)) {
+            //same(TipoToken.FUN);
             same(TipoToken.ID);
             same(TipoToken.PAR_ABRE);
             PARAMETERS_OPC();
@@ -654,13 +655,13 @@ public class AnalizadorSintactico {
             BLOCK();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: FUN.\nMetodo: FUNCTION()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: FUN.\nMetodo: FUNCTION()";
         }
     }
 
     void FUNCTIONS() {
         if (error) return;
-        if (preanalisis.tipo.equals(TipoToken.FUN)) {
+        if (preanalisis.tipo.equals(TipoToken.ID)) {
             FUNCTION();
             FUNCTIONS();
         }
@@ -682,7 +683,7 @@ public class AnalizadorSintactico {
             PARAMETERS_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nEsperando: IDENTIFICADOR.\nMetodo: PARAMETERS()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nEsperando: IDENTIFICADOR.\nMetodo: PARAMETERS()";
         }
     }
 
@@ -716,7 +717,7 @@ public class AnalizadorSintactico {
             ARGUMENTS_2();
         } else {
             error = true;
-            System.out.println("[X] Posición " + preanalisis.posicion + ".\nMetodo: ARGUMENTS()");
+            errorMessage = "[X] Posición " + preanalisis.posicion + ".\nMetodo: ARGUMENTS()";
         }
     }
 
