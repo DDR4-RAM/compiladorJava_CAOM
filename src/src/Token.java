@@ -4,17 +4,35 @@ public class Token {
 
     final TipoToken tipo;
     final String lexema;
-    final Object literal;
-    final int linea;
+    Object literal;
+    int posicion;
 
-    public Token(TipoToken tipo, String lexema, Object literal, int linea) {
+    public Token(TipoToken tipo, String lexema, Object literal, int posicion) {
         this.tipo = tipo;
         this.lexema = lexema;
         this.literal = literal;
-        this.linea = linea;
+        this.posicion = posicion;
     }
 
-    public String toString(){
+    public Token(TipoToken tipo, String lexema) {
+        this.tipo = tipo;
+        this.lexema = lexema;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o == this) {
+            return true;
+        }
+        if (!(o instanceof TipoToken)) {
+            return false;
+        }
+        TipoToken c = (TipoToken) o;
+        return this.tipo.equals(c);
+    }
+
+    public String toString() {
         return tipo + " " + lexema + " " + literal;
     }
 }

@@ -1,11 +1,13 @@
 package src;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 // AUTOR: Carlos Andres Ortiz Montero
 public class Scanner {
+
+
+    // Cambiar lo del punto
+    // Cambiar que no analice la parte sintactica solo tokens
 
     private final String source;
 
@@ -17,6 +19,7 @@ public class Scanner {
 
 
     // PUREBA
+    // Cambiar que justo cuando detecte la palabra reservada añade el token
     // clase hola.fun myfun [ dsandjlksandnlknakl ]imp dna. var variable = value. nulo fal ver  ciclo condicion [ sentencias ] si( cond1 y cond2 o cond3 y cond4) este este  super super
     static {
         palabrasReservadas = new HashMap<>();
@@ -39,27 +42,15 @@ public class Scanner {
         palabrasReservadas.put("ret", TipoToken.RET);
         // Ciclos
         palabrasReservadas.put("ciclo", TipoToken.CICLO); // ES EL MIENTRAS
-
-        /*
-        palabrasReservadas.put("ademas", );
-        palabrasReservadas.put("para", );
-
-
-        */
+        palabrasReservadas.put("ademas", TipoToken.ADEMAS);
+        palabrasReservadas.put("para", TipoToken.PARA);
     }
 
-    Scanner(String source) {
+    public Scanner(String source) {
         this.source = source;
     }
 
-
-    //int estado = 0;
-
-    /*public List<Token> getLista() {
-        return tokens;
-    }*/
-
-    List<Token> scanTokens() {
+    public List<Token> scanTokens() {
         //Aquí va el corazón del scanner.
 
         /*
@@ -67,16 +58,206 @@ public class Scanner {
         y al final agregar el token de fin de archivo
          */
         int index = 0;
-        String token = "";
-        String value = "";
+        int limit = 0;
+        ///String token = "";
+        StringBuilder value = new StringBuilder();
+        char caracter = ' ';
+        char sig_carac = ' ';
         int estado = 0;
+        int inicioLexema = 0;
         TipoToken tipoToken = null;
         while (true) {
             try {
-                String currentCharacter = String.valueOf(source.charAt(index));
+                if (index == source.length()) {
+                    break;
+                }
+                caracter = source.charAt(index);
+                System.out.println(caracter);
+                if (!(index + 1 >= source.length())) {
+                    sig_carac = source.charAt(index + 1);
+                }
+                switch (estado) {
+                    case 0:
+                        if (caracter == '+') {
+                            tokens.add(new Token(TipoToken.MAS, "+", null, index + 1));
+                        } else if (caracter == '-') {
+                            tokens.add(new Token(TipoToken.MENOS, ",", null, index + 1));
+                        } else if (caracter == '*') {
+                            tokens.add(new Token(TipoToken.POR, ".", null, index + 1));
+                        } else if (caracter == '/') {
+                            if (sig_carac == '*') {
+                                estado = 2;
+                                value.append(caracter);
+                                inicioLexema = index;
+                            } else {
+                                tokens.add(new Token(TipoToken.ENTRE, ".", null, index + 1));
+                            }
+                        } else if (caracter == '=') {
+                            if (sig_carac == '=') {
+                                tokens.add(new Token(TipoToken.IGUAL, "==", null, index + 1));
+                                index++;
+                            } else {
+                                tokens.add(new Token(TipoToken.ASIGNAR, "=", null, index + 1));
+                            }
+                        } else if (caracter == '(') {
+                            tokens.add(new Token(TipoToken.PAR_ABRE, "(", null, index + 1));
+                        } else if (caracter == ')') {
+                            tokens.add(new Token(TipoToken.PAR_CIERRE, ")", null, index + 1));
+                        } else if (caracter == '{') {
+                            tokens.add(new Token(TipoToken.LLAV_ABRE, "{", null, index + 1));
+                        } else if (caracter == '}') {
+                            tokens.add(new Token(TipoToken.LLAV_CIERRE, "}", null, index + 1));
+                        } else if (caracter == '<') {
+                            if (sig_carac == '=') {
+                                tokens.add(new Token(TipoToken.MENOR_IGUAL, "<=", null, index + 1));
+                                index++;
+                            } else {
+                                tokens.add(new Token(TipoToken.MENOR, "<", null, index + 1));
+                            }
+                        } else if (caracter == '>') {
+                            if (sig_carac == '=') {
+                                tokens.add(new Token(TipoToken.MENOR_IGUAL, "<=", null, index + 1));
+                                index++;
+                            } else {
+                                tokens.add(new Token(TipoToken.MAYOR, ">", null, index + 1));
+                            }
+                        } else if (caracter == '!') {
+                            if (sig_carac == '=') {
+                                tokens.add(new Token(TipoToken.DIFERENTE, "!=", null, index + 1));
+                                index++;
+                            } else {
+                                tokens.add(new Token(TipoToken.NOT, "!", null, index + 1));
+                            }
+                        } else if (caracter == ',') {
+                            tokens.add(new Token(TipoToken.COMA, ",", null, index + 1));
+                        } else if (caracter == '.') {
+                            tokens.add(new Token(TipoToken.PUNTO, ".", null, index + 1));
+                        } else if (caracter == ';') {
+                            System.out.println("PUNTO Y COMA");
+                            tokens.add(new Token(TipoToken.PUNTO_COMA, ";", null, index + 1));
+                        } else if (Character.isAlphabetic(caracter)) {
+                            estado = 1;
+                            value.append(caracter);
+                            inicioLexema = index;
+                        } else if (Character.isDigit(caracter)) {
+                            estado = 4;
+                            value.append(caracter);
+                            inicioLexema = index;
+                        } else if (caracter == '"') {
+                            estado = 3;
+                            value.append(caracter);
+                            inicioLexema = index;
+                        }
+                        break;
+                    case 1:
+                        if (Character.isAlphabetic(caracter) || Character.isDigit(caracter)) {
+                            value.append(caracter);
+                        } else {
+                            TipoToken tt = palabrasReservadas.get(value.toString());
+                            if (tt == null) {
+                                tokens.add(new Token(TipoToken.ID, value.toString(), null, inicioLexema + 1));
+                            } else {
+                                tokens.add(new Token(tt, value.toString(), null, inicioLexema + 1));
+                            }
+
+                            estado = 0;
+                            index--;
+                            value = new StringBuilder();
+                            inicioLexema = 0;
+                        }
+                        break;
+                    case 2:
+                        if (caracter == '*') {
+                            if (source.charAt(index + 1) == '/') {
+                                estado = 0;
+
+                                index = index + 1;
+                                value.append(caracter);
+
+                                caracter = source.charAt(index);
+                                value.append(caracter);
+
+
+                                tokens.add(new Token(TipoToken.COMENTARIO, value.toString(), null, inicioLexema));
+                                value = new StringBuilder();
+                            } else {
+                                value.append(caracter);
+                            }
+                        } else {
+                            value.append(caracter);
+                        }
+                        break;
+                    case 3:
+                        value.append(caracter);
+                        if (caracter == '"') {
+                            if (value.length() > 1 && value.charAt(value.length() - 2) != '\\') {
+                                tokens.add(new Token(TipoToken.CADENA, value.toString(), null, inicioLexema + 1));
+                                estado = 0;
+                                inicioLexema = 0;
+                                value = new StringBuilder();
+                            }
+                        }
+                        break;
+                    case 4:
+                        if (Character.isDigit(caracter)) {
+                            value.append(caracter);
+                        } else {
+                            tokens.add(new Token(TipoToken.NUMERO, value.toString(), null, inicioLexema));
+                            estado = 0;
+                            value = new StringBuilder();
+                            inicioLexema = 0;
+                            index--;
+                        }
+                        break;
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                e.printStackTrace();
+                break;
+            }
+            index += 1;
+        }
+        tokens.add(new Token(TipoToken.EOF, "--", null, linea));
+        return tokens;
+    }
+}
+
+/*
+Signos o símbolos del lenguaje:
+(
+)
+{
+}
+,
+.
+;
+-
++
+*
+/
+!
+!=
+=
+==
+<
+<=
+>
+>=
+// -> comentarios (no se genera token)
+/* ... * / -> comentarios (no se genera token)
+Identificador,
+Cadena
+Numero
+Cada palabra reservada tiene su nombre de token
+ */
+
+
+/*
+* String currentCharacter = String.valueOf(source.charAt(index));
                 switch (estado) {
                     case 0:
                         value = "";
+                        limit = 0;
                         token = "";
                         if (source.charAt(index) == 'c') {
                             estado = 1;
@@ -102,14 +283,29 @@ public class Scanner {
                         } else if (source.charAt(index) == 'e') {
                             estado = 32;
                             tipoToken = TipoToken.ESTE;
+                        } else if (source.charAt(index) == '"') {
+                            estado = 37;
+                            tipoToken = TipoToken.CADENA;
+                        }else if (source.charAt(index) == '/'){
+                            estado = 40;
+                            tipoToken = TipoToken.COMENTARIO;
+                        } else if (source.charAt(index) == '1' || source.charAt(index) == '2' || source.charAt(index) == '3' || source.charAt(index) == '4' || source.charAt(index) == '5' || source.charAt(index) == '6' || source.charAt(index) == '7' || source.charAt(index) == '8' || source.charAt(index) == '9' || source.charAt(index) == '0') {
+                            estado = 38;
+                            tipoToken = TipoToken.NUMERO;
                         }
                         break;
                     case 1:
                         if (source.charAt(index) == 'l') {
                             estado = 2;
                         } else if (source.charAt(index) == 'i') {
-                            estado = 18;
-                            tipoToken = TipoToken.CICLO;
+                            if (tipoToken == TipoToken.SI) {
+                                tokens.add(new Token(tipoToken, "--", token, linea));
+                                estado = 0;
+                            } else if (tipoToken == TipoToken.CLASE) {
+                                estado = 18;
+                                tipoToken = TipoToken.CICLO;
+                                tokens.add(new Token(tipoToken, "--", token, linea));
+                            }
                         } else {
                             estado = 0;
                         }
@@ -152,7 +348,7 @@ public class Scanner {
                         }
                         break;
                     case 6:
-                        if (source.charAt(index) == '.') {
+                        if (source.charAt(index) == ';') {
                             tokens.add(new Token(tipoToken, "--", token, linea));
                             estado = 0;
                         } else {
@@ -183,7 +379,7 @@ public class Scanner {
                         }
                         break;
                     case 10:
-                        if (source.charAt(index) == '.') {
+                        if (source.charAt(index) == ';') {
                             estado = 0;
                             tokens.add(new Token(tipoToken, value, token, linea));
                         } else {
@@ -210,6 +406,7 @@ public class Scanner {
                         break;
                     case 13:
                         if (source.charAt(index) == '[') {
+                            tokens.add(new Token(TipoToken.SEPARADOR_CLASE, value, token, linea));
                             estado = 14;
                         } else {
                             token += currentCharacter;
@@ -217,11 +414,11 @@ public class Scanner {
                         break;
                     case 14:
                         if (source.charAt(index) == ']') {
-                            tokens.add(new Token(tipoToken, value, token, linea));
-                            estado = 0;
+                            tokens.add(new Token(TipoToken.SEPARADOR_CLASE, value, token, linea));
                         } else {
                             value += source.charAt(index);
                         }
+                        estado = 0;
                         break;
                     case 15:
                         if (source.charAt(index) == 'm') {
@@ -309,8 +506,8 @@ public class Scanner {
                         break;
                     case 28:
                         if (source.charAt(index) == ')') {
-                            tokens.add(new Token(tipoToken, "--", value, linea));
-                            tokens.add(new Token(TipoToken.SI, "--", token, linea));
+                            // tokens.add(new Token(tipoToken, "--", value, linea));
+                            // tokens.add(new Token(TipoToken.SI, "--", token, linea));
                             estado = 0;
                         } else {
                             token += currentCharacter;
@@ -383,47 +580,60 @@ public class Scanner {
                             estado = 0;
                         }
                         break;
+                    case 37:
+                        if (source.charAt(index) == '"') {
+                            estado = 0;
+                            tokens.add(new Token(tipoToken, "--", value, linea));
+                        } else {
+                            value += currentCharacter;
+                        }
+                        break;
+                    case 38:
+                        if (!Character.isDigit(source.charAt(index))) {
+                            if (source.charAt(index) == ' ' || source.charAt(index) == ';') {
+                                tokens.add(new Token(tipoToken, "--", value, linea));
+                                estado = 0;
+                            } else {
+                                estado = 39;
+                            }
+                        } else {
+                            value += currentCharacter;
+                        }
+                        break;
+                    case 39:
+                        if (source.charAt(index) == ' ' || source.charAt(index) == ';') {
+                            estado = 0;
+                        } else {
+                            if (limit == 100) {
+                                break;
+                            }
+                            limit += 1;
+                        }
+                        break;
+                    case 40:
+                        if(source.charAt(index) == '*'){
+                            estado = 41;
+                        }else{
+                            estado = 0;
+                        }
+                        break;
+                    case 41:
+                        if(source.charAt(index) == '*'){
+                            estado = 42;
+                        }else{
+                            value += currentCharacter;
+                        }
+                        break;
+                    case 42:
+                        if(source.charAt(index) == '/'){
+                            estado = 0;
+                            tokens.add(new Token(tipoToken, "--", value, linea));
+                        }else{
+                            estado = 41;
+                            value += currentCharacter;
+                        }
+                        break;
                     default:
                         estado = 0;
                         break;
-                }
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-                break;
-            }
-            index += 1;
-        }
-        tokens.add(new Token(TipoToken.EOF, "--", null, linea));
-        return tokens;
-    }
-}
-
-/*
-Signos o símbolos del lenguaje:
-(
-)
-{
-}
-,
-.
-;
--
-+
-*
-/
-!
-!=
-=
-==
-<
-<=
->
->=
-// -> comentarios (no se genera token)
-/* ... * / -> comentarios (no se genera token)
-Identificador,
-Cadena
-Numero
-Cada palabra reservada tiene su nombre de token
-
- */
+                }*/

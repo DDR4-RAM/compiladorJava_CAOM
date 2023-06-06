@@ -54,6 +54,8 @@ public class Interprete {
         for (Token token : tokens) {
             System.out.println(token);
         }
+        AnalizadorSintactico analizadorSintactico = new AnalizadorSintactico(tokens);
+        analizadorSintactico.parse();
     }
 
     /*
