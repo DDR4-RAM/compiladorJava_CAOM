@@ -26,7 +26,7 @@ public class AnalizadorSintactico {
         if (!error && !preanalisis.tipo.equals(TipoToken.EOF)) {
             return "[X] Posicion " + preanalisis.posicion + ". No se esperaba el token " + preanalisis.tipo + " Metodo: parse()";
         } else if (!error && preanalisis.tipo.equals(TipoToken.EOF)) {
-            return "Sin errores";
+            return "Sin errores, consulta valida :)";
         }
         return errorMessage;
     }
@@ -200,8 +200,11 @@ public class AnalizadorSintactico {
         if (preanalisis.tipo.equals(TipoToken.FOR)) {
             same(TipoToken.FOR);
             same(TipoToken.PAR_ABRE);
+            System.out.println("\nSM1");
             FOR_STMT_1();
+            System.out.println("\nSM2");
             FOR_STMT_2();
+            System.out.println("\nSM3");
             FOR_STMT_3();
             same(TipoToken.PAR_CIERRE);
             STATEMENT();
@@ -216,8 +219,7 @@ public class AnalizadorSintactico {
 
         if (preanalisis.tipo.equals(TipoToken.VAR)) {
             VAR_DECL();
-        }
-        if (preanalisis.tipo.equals(TipoToken.NOT) || preanalisis.tipo.equals(TipoToken.MENOS) || preanalisis.tipo.equals(TipoToken.TRUE) || preanalisis.tipo.equals(TipoToken.FALSE) ||
+        }else if (preanalisis.tipo.equals(TipoToken.NOT) || preanalisis.tipo.equals(TipoToken.MENOS) || preanalisis.tipo.equals(TipoToken.TRUE) || preanalisis.tipo.equals(TipoToken.FALSE) ||
                 preanalisis.tipo.equals(TipoToken.NULL) || preanalisis.tipo.equals(TipoToken.THIS) || preanalisis.tipo.equals(TipoToken.NUMERO) || preanalisis.tipo.equals(TipoToken.CADENA) ||
                 preanalisis.tipo.equals(TipoToken.ID) || preanalisis.tipo.equals(TipoToken.PAR_ABRE) || preanalisis.tipo.equals(TipoToken.SUPER)) {
             EXPR_STMT();
@@ -231,7 +233,8 @@ public class AnalizadorSintactico {
 
     void FOR_STMT_2() {
         if (error) return;
-
+        System.out.println("\nNSKDNALDNAS");
+        System.out.println(preanalisis.tipo);
         if (preanalisis.tipo.equals(TipoToken.NOT) || preanalisis.tipo.equals(TipoToken.MENOS) || preanalisis.tipo.equals(TipoToken.TRUE) || preanalisis.tipo.equals(TipoToken.FALSE) ||
                 preanalisis.tipo.equals(TipoToken.NULL) || preanalisis.tipo.equals(TipoToken.THIS) || preanalisis.tipo.equals(TipoToken.NUMERO) || preanalisis.tipo.equals(TipoToken.CADENA) ||
                 preanalisis.tipo.equals(TipoToken.ID) || preanalisis.tipo.equals(TipoToken.PAR_ABRE) || preanalisis.tipo.equals(TipoToken.SUPER)) {
